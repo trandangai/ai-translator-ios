@@ -1,4 +1,4 @@
-import FirebaseRemoteConfig
+@preconcurrency import FirebaseRemoteConfig
 import Foundation
 import Observation
 
@@ -7,9 +7,9 @@ import Observation
 @Observable
 public final class RemoteInterpreterConfig {
     public private(set) var isKillSwitchActive: Bool = false
-    private let remoteConfig = RemoteConfig.remoteConfig()
 
     public init() {
+        let remoteConfig = RemoteConfig.remoteConfig()
         let settings = RemoteConfigSettings()
         settings.minimumFetchInterval = 60
         remoteConfig.configSettings = settings
@@ -18,10 +18,15 @@ public final class RemoteInterpreterConfig {
 
     public func fetchAndActivate() async {
         do {
-            _ = try await remoteConfig.fetchAndActivate()
-            isKillSwitchActive = remoteConfig.configValue(forKey: "kill_switch_active").boolValue
+            isKillSwitchActive = try await Self.fetchKillSwitchValue()
         } catch {
             // Keep existing default/cached value
         }
+    }
+
+    private nonisolated static func fetchKillSwitchValue() async throws -> Bool {
+        let remoteConfig = RemoteConfig.remoteConfig()
+        _ = try await remoteConfig.fetchAndActivate()
+        return remoteConfig.configValue(forKey: "kill_switch_active").boolValue
     }
 }

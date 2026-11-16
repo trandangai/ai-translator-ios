@@ -9,7 +9,7 @@ final class AudioDspTests: XCTestCase {
     }
 
     func testFullScaleSquareWaveReturns0Db() {
-        let loud = [Int16](repeating: 32767, count: AudioFormatConstants.samplesPerFrame)
+        let loud = (0..<AudioFormatConstants.samplesPerFrame).map { $0 % 2 == 0 ? Int16(32767) : Int16(-32767) }
         let db = AudioDspMath.calculateRmsDb(samples: loud)
         XCTAssertEqual(db, 0.0, accuracy: 0.1)
     }
