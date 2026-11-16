@@ -1,0 +1,11 @@
+# Swift Package Manager & Xcode
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+*.xcodeproj
+!*.xcodeproj/project.pbxproj
+xcuserdata/
+
+# Secrets / Firebase
+GoogleService-Info.plist

@@ -1,0 +1,31 @@
+name: iOS Build & Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  core-tests:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run AITranslatorCore Swift Package Tests
+        run: swift test --package-path Packages/AITranslatorCore
+
+  xcode-build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode Project
+        run: xcodegen generate
+      - name: Build AITranslator for iOS Simulator
+        run: |
+          xcodebuild build \
+            -project AITranslator.xcodeproj \
+            -scheme AITranslator \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            CODE_SIGNING_ALLOWED=NO
