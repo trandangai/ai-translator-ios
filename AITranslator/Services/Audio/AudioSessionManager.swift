@@ -30,10 +30,15 @@ public final class AudioSessionManager {
 
     public func configureForLiveSession() throws {
         let session = AVAudioSession.sharedInstance()
+        #if compiler(>=6.2)
+        let options: AVAudioSession.CategoryOptions = [.defaultToSpeaker, .allowBluetoothHFP, .allowBluetoothA2DP]
+        #else
+        let options: AVAudioSession.CategoryOptions = [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP]
+        #endif
         try session.setCategory(
             .playAndRecord,
             mode: .default,
-            options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP]
+            options: options
         )
         try session.setPreferredSampleRate(16_000)
         try session.setPreferredIOBufferDuration(0.030)
