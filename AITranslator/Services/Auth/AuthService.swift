@@ -1,6 +1,6 @@
-import FirebaseAuth
+@preconcurrency import FirebaseAuth
 import Foundation
-import GoogleSignIn
+@preconcurrency import GoogleSignIn
 import Observation
 import UIKit
 
