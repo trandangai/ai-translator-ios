@@ -10,7 +10,7 @@ public final class UserSettingsRepository {
     public private(set) var profile: UserSettingsProfile?
     public private(set) var todayQuota: DailyUsageQuota = DailyUsageQuota()
 
-    private let db = Firestore.firestore()
+    private var db: Firestore { Firestore.firestore() }
 
     public init() {}
 

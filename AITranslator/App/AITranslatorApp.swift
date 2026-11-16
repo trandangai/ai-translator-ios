@@ -8,14 +8,16 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        // Register App Check provider BEFORE FirebaseApp.configure() (Section 9.1)
-        #if DEBUG
-        AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
-        #else
-        AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory())
-        #endif
+        if FirebaseApp.app() == nil {
+            // Register App Check provider BEFORE FirebaseApp.configure() (Section 9.1)
+            #if DEBUG
+            AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+            #else
+            AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory())
+            #endif
 
-        FirebaseApp.configure()
+            FirebaseApp.configure()
+        }
         return true
     }
 
@@ -40,10 +42,26 @@ final class AppAttestProviderFactory: NSObject, AppCheckProviderFactory {
 struct AITranslatorApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    @State private var prefsManager = LocalPreferencesManager()
-    @State private var authService = AuthService()
-    @State private var userRepo = UserSettingsRepository()
-    @State private var remoteConfig = RemoteInterpreterConfig()
+    @State private var prefsManager: LocalPreferencesManager
+    @State private var authService: AuthService
+    @State private var userRepo: UserSettingsRepository
+    @State private var remoteConfig: RemoteInterpreterConfig
+
+    init() {
+        if FirebaseApp.app() == nil {
+            #if DEBUG
+            AppCheck.setAppCheckProviderFactory(AppCheckDebugProviderFactory())
+            #else
+            AppCheck.setAppCheckProviderFactory(AppAttestProviderFactory())
+            #endif
+
+            FirebaseApp.configure()
+        }
+        _prefsManager = State(initialValue: LocalPreferencesManager())
+        _authService = State(initialValue: AuthService())
+        _userRepo = State(initialValue: UserSettingsRepository())
+        _remoteConfig = State(initialValue: RemoteInterpreterConfig())
+    }
 
     var body: some Scene {
         WindowGroup {
